@@ -14,8 +14,8 @@ namespace SellVMDemo.Controllers
     {
         public ActionResult Index()
         {
-            var creds = new AzureCredentialsFactory().FromUser(SettingsHelper.UserId, SettingsHelper.UserPassword, tenant, AzureEnvironment.AzureGlobalCloud);
-            var azure = Azure.Authenticate(creds).WithSubscription(subscriptionID);
+      //      var creds = new AzureCredentialsFactory().FromUser(SettingsHelper.UserId, SettingsHelper.UserPassword, SettingsHelper.ClientId, "", AzureEnvironment.AzureGlobalCloud);
+        //    var azure = Azure.Authenticate(creds).WithSubscription("");
             return View();
         }
 
