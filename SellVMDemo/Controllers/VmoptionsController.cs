@@ -26,10 +26,6 @@ namespace SellVMDemo.Controllers
         // GET: Vmoptions
         public JsonResult avaliable(string tenantID ,string subID , string region)
         {
-            if(subID == null || subID.Equals("") )subID= ConfigurationManager.AppSettings["client-azure-subscription"];
-            if(subID == null || subID.Equals("") )subID = ConfigurationManager.AppSettings["client-tenant"];
-
-            Console.WriteLine(subID + "    " + tenantID);
 
             AzureCredentials credentials = new AzureCredentials(getUserLoginInformation(), "e4c9ab4e-bd27-40d5-8459-230ba2a757fb", AzureEnvironment.AzureGlobalCloud);
             var azure = Azure.Authenticate(credentials).WithSubscription(subID);
