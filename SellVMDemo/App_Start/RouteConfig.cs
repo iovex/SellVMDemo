@@ -18,6 +18,12 @@ namespace SellVMDemo
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Bill", action = "Index", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+            "avaliableSizes",                                              
+            "{controller}/{action}/{tenantID}/{subID}/{region}",                           
+            new { controller = "Vmoptions", action = "avaliable", tenantID = "", subID = "" ,region="" }  
+        );
         }
     }
 }
