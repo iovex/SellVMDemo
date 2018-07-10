@@ -2,18 +2,47 @@
 
 <div>
 	select VM region:
-	<select id = "regionsSelecor" onchange="regionSelect()" onclick="getRegions()" >
+	<select id = "regionsSelecor" onchange="regionSelect(null,null)" onclick="getRegions()" >
 		<option value="" disabled selected>Select your region</option>
 	</select>	
 </div>
 
 <div>
 	select VM size:
-	<select id = "sizeSelecor" onchange="sizeSelect()" onclick="getSize()" >
-		<option value="" disabled selected>Select your size</option>
+	<select id = "sizeSelecor"  onchange="getSize()">
+		<option value="" disabled selected>Select your region first</option>
 	</select>	
-	
 </div>
 
+<div id="vmSizeInfo" hidden="hidden">
+	<p></p>
+	<p>Cores :<span id="cores"/></p>
+	<p >Memory: <span id="memory"/></p>
+	<p >Max disk count:<span id="maxdiskcount"/></p>
+	
+	<div id="diskList"></div>
+	
+	<p>Data disks you can add for your VM : <span id="dataDisksLeft"/></p>
+	
+	<button id = "diskAdder" onclick="addDisks()">add a data disk</button>
+</div>
+</br>
+<div id = "osSelector" >
+	<select id="osType" onchange="getPopularOsImage()">
+		<option value="" disabled selected>Select OS type</option>
+		<option value="windows">windows</option>
+		<option value="linus">linux</option>
+	</select>
+	
+	<select id="osImageSelector" ">
+		<option value="" disabled selected>Select OS type first</option>
+	</select>
+</div>
+</br>
+<div id="checkOut">
+	<button onclick="CheckAndPurchase()" >purchase</button>
+	
+</div>
+	
 <script src="../../Scripts/vmoptions.js"></script>
 

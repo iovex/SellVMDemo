@@ -23,7 +23,7 @@ namespace SellVMDemo
             "avaliableSizes",                                              
             "{controller}/{action}/{tenantID}/{subID}/{region}",                           
             new { controller = "Vmoptions", action = "avaliable", tenantID = "", subID = "" ,region="" }  
-        );
+            );
         }
     }
 }
