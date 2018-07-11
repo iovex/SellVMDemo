@@ -106,7 +106,7 @@ function getPopularOsImage(){
 
 function addDisks(){
 	
-	var diskItem = "<div ><input type='range' min='10' max='1000' value='10' oninput='change(this)'/> <span id='diskSize'>10</span> <button value='delete' onclick='deleteDisk(this)'>delete</button></div>"
+	var diskItem = "<div ><input type='range' min='10' max='1000' value='10' oninput='change(this)'/> <span id='diskSize'>10GB</span> <button value='delete' onclick='deleteDisk(this)'>delete</button></div>"
 	
 	$("#diskList").append(diskItem);
 	
@@ -120,7 +120,7 @@ function addDisks(){
 }
 
 function change(obj){
-	obj.parentElement.childNodes[2].innerHTML=obj.value;
+	obj.parentElement.childNodes[2].innerHTML=obj.value + "GB";
 }
 
 
