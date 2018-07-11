@@ -130,6 +130,10 @@ function deleteDisk(obj){
 }
 
 function CheckAndPurchase(){
+	
+	var clientID = CLIENT_TENANT;
+	var clientsub = CLIENT_SUBSCRIPTION;
+	
 	if(
 		$("#regionsSelecor").val() &&
 		$("#osType").val() &&
@@ -148,7 +152,8 @@ function CheckAndPurchase(){
 		
 		$.ajax({
 			type:"post",
-			url:"",
+			url:"/vmoptions/create/"+ clientID + "/" +  clientsub,
+			data:vmParams,
 			async:true,
 			success:function(result){
 				console.log(result);

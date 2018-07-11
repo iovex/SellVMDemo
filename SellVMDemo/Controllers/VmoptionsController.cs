@@ -4,12 +4,14 @@ using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
+using SellVMDemo.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 
 namespace SellVMDemo.Controllers
@@ -39,7 +41,23 @@ namespace SellVMDemo.Controllers
          
         }
 
-        public JsonResult popularos()
+        //post
+        public JsonResult create(string tenantID, string subID, [FromBody]VmParams vmParams)
+        {
+            AzureCredentials credentials = new AzureCredentials(getUserLoginInformation(), tenantID, AzureEnvironment.AzureGlobalCloud);
+            var azure = Azure.Authenticate(credentials).WithSubscription(subID);
+
+            if(azure.Networks.List().LongCount() == 0)
+            {
+                azure.Networks.Define("defaultNetwork").WithRegion(vmParams.region).WithNewResourceGroup("defaultNetworkGp").WithAddressSpace("");
+
+            }
+
+            return new JsonResult() { Data = null};
+        }
+
+
+            public JsonResult popularos()
         {
             var oslist = new List<IEnumerable>();
             
