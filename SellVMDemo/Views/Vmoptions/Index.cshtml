@@ -1,12 +1,13 @@
 ﻿<script src="../../Scripts/jquery-1.10.2.min.js"></script>
+<h3>VM creater</h3>
 
 <div>
 	select VM region:
-	<select id = "regionsSelecor" onchange="regionSelect(null,null)" onclick="getRegions()" >
+	<select id = "regionsSelecor" onchange="regionSelect()" onclick="getRegions()" >
 		<option value="" disabled selected>Select your region</option>
 	</select>	
 </div>
-
+</br>
 <div>
 	select VM size:
 	<select id = "sizeSelecor"  onchange="getSize()">
@@ -26,8 +27,11 @@
 	
 	<button id = "diskAdder" onclick="addDisks()">add a data disk</button>
 </div>
+
 </br>
+
 <div id = "osSelector" >
+	select OS :
 	<select id="osType" onchange="getPopularOsImage()">
 		<option value="" disabled selected>Select OS type</option>
 		<option value="windows">windows</option>
@@ -38,11 +42,50 @@
 		<option value="" disabled selected>Select OS type first</option>
 	</select>
 </div>
-</br>
-<div id="checkOut">
-	<button onclick="CheckAndPurchase()" >purchase</button>
+
+<hr>
+
+<div id="pricingBoard">
+	<h3>Pricing forecast</h3>
+	
+	
+	
+	how long you want to buy:
+	<select id="modeSelector" onchange="getType(this)">
+		<option value = "" disabled selected>select type</option>
+		<option value="1"> By month</option>
+		<option value="2"> By year</option>
+	</select>
+	
+	<select id="timeSelector" onchange="getPricing()" hidden="hidden">
+		<option value = "" disabled selected>select time</option>
+		<option value='1'>1</option>
+		<option value='2'>2</option>
+		<option value='3'>3</option>
+		<option value='4'>4</option>
+		<option value='5'>5</option>
+		<option value='6'>6</option>
+		<option value='7'>7</option>
+		<option value='8'>8</option>
+		<option value='9'>9</option>
+		<option value='10'>10</option>
+		<option value='11'>11</option>
+		<option value='12'>12</option>
+	</select>
+	<span id="timetext"></span>
+	
+	<p id ="pricingInfo" >budget for This VM :<span id="pricingNum"/></p> 
 	
 </div>
-	
+
+<hr>
+
+<div id="checkOut">
+	<button onclick="CheckAndPurchase(this)" >purchase</button>
+	<div id ="result"></div>
+</div>
+
+
+
 <script src="../../Scripts/vmoptions.js"></script>
 

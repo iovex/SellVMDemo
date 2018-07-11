@@ -1,5 +1,8 @@
-﻿var CLIENT_TENANT = "e4c9ab4e-bd27-40d5-8459-230ba2a757fb" ;
-var CLIENT_SUBSCRIPTION = "e5b0fcfa-e859-43f3-8d84-5e5fe29f4c68";
+﻿var url =new URL(window.location.href)
+
+var CLIENT_TENANT = url.searchParams.get("CLIENT_TENANT") ; 
+var CLIENT_SUBSCRIPTION = url.searchParams.get("CLIENT_SUBSCRIPTION")
+
 var sizeList = null;
 var osList = null;
 var selectedVmSize = null ;
@@ -34,10 +37,10 @@ function getRegions() {
     }        
 }
 
-function regionSelect( client_tenant , client_subscription){
+function regionSelect(){
 	
-	if(!client_tenant)client_tenant = CLIENT_TENANT ; 
-	if(!client_subscription)client_subscription = CLIENT_SUBSCRIPTION;
+	var client_tenant = CLIENT_TENANT ; 
+	var client_subscription = CLIENT_SUBSCRIPTION;
 	
 	var region = $("#regionsSelecor option:selected").text();
 	$("#sizeSelecor").children().remove();
@@ -129,7 +132,7 @@ function deleteDisk(obj){
 	$("#dataDisksLeft").text(diskLeft);
 }
 
-function CheckAndPurchase(){
+function CheckAndPurchase(obj){
 	
 	var clientID = CLIENT_TENANT;
 	var clientsub = CLIENT_SUBSCRIPTION;
@@ -147,8 +150,9 @@ function CheckAndPurchase(){
 		vmParams.dataDisks = dataDisks;
 		if(vmParams.dataDisks > 0) vmParams.dataDisksDetails = getDataDiskDetails();
 		vmParams.dataDisksDetails = getDataDiskDetails();
-		console.log(vmParams);
 		
+		obj.innerHTML="request sent , it will take about 15 mins , pls wait  "
+		obj.disabled="disabled";
 		
 		$.ajax({
 			type:"post",
@@ -156,7 +160,10 @@ function CheckAndPurchase(){
 			data:vmParams,
 			async:true,
 			success:function(result){
-				console.log(result);
+				$("#result").text(result);
+			},
+			error: function(){
+				$("#result").text("Error");
 			}
 		});
 		
@@ -189,3 +196,12 @@ function getDataDiskDetails(){
 }
 
 
+function getType(obj){
+	
+	$("#timeSelector").show();
+	
+	var timetext = obj.value == 1 ?  "month(es)" : "year(s)"
+	
+	$("#timetext").text(timetext);
+	
+}
