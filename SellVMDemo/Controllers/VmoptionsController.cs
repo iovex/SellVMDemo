@@ -96,15 +96,18 @@ namespace SellVMDemo.Controllers
 
 
         private IWithManagedDataDisk addDataDisks(IAzure azure , IWithManagedDataDisk vm, VmParams vmParams,string rgname) {
-            foreach (var disk in vmParams.dataDisksDetails)
+            if (vmParams.dataDisks > 0)
             {
-                var dataDiskCreatable = azure.Disks.Define(disk.id)
-                   .WithRegion(vmParams.region)
-                   .WithExistingResourceGroup(rgname)
-                   .WithData()
-                   .WithSizeInGB(disk.size);
+                foreach (var disk in vmParams.dataDisksDetails)
+                {
+                    var dataDiskCreatable = azure.Disks.Define(disk.id)
+                       .WithRegion(vmParams.region)
+                       .WithExistingResourceGroup(rgname)
+                       .WithData()
+                       .WithSizeInGB(disk.size);
 
-                vm.WithNewDataDisk(dataDiskCreatable);
+                    vm.WithNewDataDisk(dataDiskCreatable);
+                }
             }
 
             return vm;
