@@ -39,6 +39,7 @@ function getRegions() {
 
 function regionSelect(){
 	
+	
 	var client_tenant = CLIENT_TENANT ; 
 	var client_subscription = CLIENT_SUBSCRIPTION;
 	
@@ -55,7 +56,9 @@ function regionSelect(){
                     $("#sizeSelecor").append('<option value=' + index + '>' + result[index].Name+'</option>');              
                 }
                 $("#sizeSelecor").children()[0].remove();
-                $("#sizeSelecor").append('<option value="" disabled selected>Select VM Size</option>')
+                $("#sizeSelecor").append('<option value="" disabled selected>Select VM Size</option>');
+                selectedVmSize = null;
+                $("#vmSizeInfo").hide();
 			}
 	});	
 	
@@ -72,7 +75,8 @@ function getSize(){
 	$("#dataDisksLeft").text(selectedVmSize.MaxDataDiskCount);
 	$("#vmSizeInfo").show();
 	$("#diskAdder").show();
-	$("#diskList").empty()
+	$("#diskList").empty();
+	
 	
 }
 
@@ -137,20 +141,8 @@ function CheckAndPurchase(obj){
 	var clientID = CLIENT_TENANT;
 	var clientsub = CLIENT_SUBSCRIPTION;
 	
-	if(
-		$("#regionsSelecor").val() &&
-		$("#osType").val() &&
-		$("#osImageSelector").val() &&
-		selectedVmSize 
-	){
-		vmParams.region = $("#regionsSelecor").val();
-		vmParams.osType=$("#osType").val();
-		vmParams.popOsImage = $("#osImageSelector").val();
-		vmParams.vmSzie = selectedVmSize.Name;
-		vmParams.dataDisks = dataDisks;
-		if(vmParams.dataDisks > 0) vmParams.dataDisksDetails = getDataDiskDetails();
-		vmParams.dataDisksDetails = getDataDiskDetails();
-		
+	if(getParams()){
+
 		obj.innerHTML="request sent , it will take about 15 mins , pls wait  "
 		obj.disabled="disabled";
 		
@@ -172,6 +164,29 @@ function CheckAndPurchase(obj){
 		alert("pls check your vm options");
 	}
 }
+
+function getParams(){
+	if($("#regionsSelecor").val() &&
+		$("#osType").val() &&
+		$("#osImageSelector").val() &&
+		selectedVmSize ){
+			
+	    vmParams.region = $("#regionsSelecor").val();
+		vmParams.osType=$("#osType").val();
+		vmParams.popOsImage = $("#osImageSelector").val();
+		vmParams.vmSzie = selectedVmSize.Name;
+		vmParams.dataDisks = dataDisks;
+		if(vmParams.dataDisks > 0) vmParams.dataDisksDetails = getDataDiskDetails();
+		vmParams.dataDisksDetails = getDataDiskDetails();
+		
+		return true;
+		}
+		else{
+			return false;
+		}
+	
+}
+
 
 
 function getDataDiskDetails(){
@@ -195,6 +210,39 @@ function getDataDiskDetails(){
 	return details;
 }
 
+function getPricing(){
+	if(!getParams()){alert("check your vm params"); return }
+	
+	$("#pricingInfo").text("calculating...");
+	
+	
+	$.ajax({
+			type:"post",
+			url:"/vmoptions/getvmpricing",
+			data:vmParams,
+			async:true,
+			success:function(result){
+				var vmp = result[0];
+				
+				var time = $("#timeSelector").val();
+				var totalDiskSize = 0;
+				for(var index in vmParams.dataDisksDetails)
+					totalDiskSize += parseInt(vmParams.dataDisksDetails[index].size); 
+				
+				var pricing = time*(vmp.rates*30*24 + vmp.diskRating * totalDiskSize);　
+				if($("#modeSelector").val() ==2 )pricing = pricing *12;
+				
+				
+				$("#pricingInfo").text("budget for this VM:"+ parseInt(pricing));
+				
+			},
+			error: function(){
+				$("#result").text("Error");
+			}
+		});
+	
+	
+}
 
 function getType(obj){
 	

@@ -215,6 +215,15 @@
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.Azure.Authentication.2.3.2\lib\net452\Microsoft.Rest.ClientRuntime.Azure.Authentication.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Store.PartnerCenter, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Store.PartnerCenter.1.8.0\lib\Net45\Microsoft.Store.PartnerCenter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Store.PartnerCenter.Extensions, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Store.PartnerCenter.1.8.0\lib\Net45\Microsoft.Store.PartnerCenter.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Store.PartnerCenter.Models, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Store.PartnerCenter.1.8.0\lib\Net45\Microsoft.Store.PartnerCenter.Models.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=8.1.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAzure.Storage.8.1.4\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
       <Private>True</Private>
@@ -407,6 +416,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Service References\Application Insights\ConnectedService.json" />
+    <Content Include="Scripts\regionMap.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -6,12 +6,18 @@ using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Store.PartnerCenter;
+using Microsoft.Store.PartnerCenter.Extensions;
+using Microsoft.Store.PartnerCenter.Models.RateCards;
+using Newtonsoft.Json;
 using SellVMDemo.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
@@ -128,7 +134,7 @@ namespace SellVMDemo.Controllers
             return new JsonResult() { Data = oslist, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-            //GET:regions
+        //GET:regions
         public JsonResult regions()
         {
 
@@ -136,15 +142,89 @@ namespace SellVMDemo.Controllers
 
         }
 
+        //post
+        public JsonResult getVMPricing([FromBody] VmParams vmParams) {
+            IPartner partner = PartnerService.Instance.CreatePartnerOperations(GetPartnerCenterTokenWithUserCredentials().Credentials);
+            var azureRateCardMeters = partner.RateCards.Azure.Get().Meters.ToList();
+        
+            var vmSizeParams = vmParams.vmSzie.ToLower().Split('_');
+            
+            var vmType = vmSizeParams[1];
+            vmType = vmType.Replace("s", "");
+            if (vmType.Split('_').Length==2) {
+                vmType = vmType.Split('_')[0];
+            }
 
-        private static UserLoginInformation getUserLoginInformation() {
+            if (vmType.Split('-').Length == 2)
+            {
+                vmType = vmType.Split('-')[0];
+            }
+
+            var regionMap = "[{\"Value\":\"AU East\",\"Key\":\"australiaeast\"},\r\n{\"Value\":\"AU Southeast\",\"Key\":\"australiasoutheast\"},\r\n{\"Value\":\"AP Southeast\",\"Key\":\"southeastasia\"},\r\n{\"Value\":\"AP East\",\"Key\":\"eastasia\"},\r\n{\"Value\":\"EU North\",\"Key\":\"northeurope\"},\r\n{\"Value\":\"EU West\",\"Key\":\"westeurope\"},\r\n{\"Value\":\"BR South\",\"Key\":\"brazilsouth\"},\r\n{\"Value\":\"US West Central\",\"Key\":\"westcentralus\"},\r\n{\"Value\":\"US South Central\",\"Key\":\"southcentralus\"},\r\n{\"Value\":\"US North Central\",\"Key\":\"northcentralus\"},\r\n{\"Value\":\"US East\",\"Key\":\"eastus\"},\r\n{\"Value\":\"US East 2\",\"Key\":\"eastus2\"},\r\n{\"Value\":\"US West\",\"Key\":\"westus\"},\r\n{\"Value\":\"US West 2\",\"Key\":\"westus2\"},\r\n{\"Value\":\"US Central\",\"Key\":\"centralus\"},\r\n{\"Value\":\"JA West\",\"Key\":\"japanwest\"},\r\n{\"Value\":\"JA East\",\"Key\":\"japaneast\"},\r\n{\"Value\":\"CA East\",\"Key\":\"canadaeast\"},\r\n{\"Value\":\"CA Central\",\"Key\":\"canadacentral\"},\r\n{\"Value\":\"KR Central\",\"Key\":\"koreacentral\"},\r\n{\"Value\":\"KR South\",\"Key\":\"koreasouth\"},\r\n{\"Value\":\"UK West\",\"Key\":\"ukwest\"},\r\n{\"Value\":\"UK South\",\"Key\":\"uksouth\"},\r\n{\"Value\":\"IN Central\",\"Key\":\"centralindia\"},\r\n{\"Value\":\"IN West\",\"Key\":\"westindia\"},\r\n{\"Value\":\"IN South\",\"Key\":\"southindia\"}]";
+
+            var regionPairs =JsonConvert.DeserializeObject<List<KeyValuePair<string,string>>>(regionMap);
+            var region = "";
+            foreach (var pair in regionPairs) {
+                if (pair.Key == vmParams.region) { region = pair.Value;break; }
+                    
+            }
+
+            var vmlist = new List<AzureMeter>();
+            foreach (var meter in azureRateCardMeters) {
+                if (meter.Category == "Virtual Machines" && 
+                    meter.Subcategory.ToLower().IndexOf(vmSizeParams[0]) >=0 &&
+                    meter.Subcategory.ToLower().IndexOf(vmType)  > 0  && 
+                    meter.Subcategory.ToLower().IndexOf("low priority") <0 &&
+                    meter.Region == region ) { vmlist.Add(meter); }
+            }
+
+            var vmlistAfterOs = new List<AzureMeter>();
+            if (vmParams.osType == "windows")  foreach (var meter in vmlist) { if (meter.Subcategory.ToLower().IndexOf("windows") > 0) { vmlistAfterOs.Add(meter); } } 
+            else { foreach (var meter2 in vmlist) if (meter2.Subcategory.ToLower().IndexOf("windows") < 0) vmlistAfterOs.Add(meter2); }
+
+            return new JsonResult() { Data = vmlistAfterOs.Select(x => new { name = x.Subcategory, rates = (x.Rates[0]*new Decimal(1.4)).ToString(), region = x.Region , vmRateUnit=x.Unit ,diskRating ="0.05" ,diskRateUnit="month/GB"}), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        private static AuthenticationResult LoginToAad()
+        {
+            // auth from azure ad 
+            var addAuthority = new UriBuilder(ConfigurationManager.AppSettings["aad:authority"] + ConfigurationManager.AppSettings["csp:partnerId"]);
+            UserCredential userCredentials = new UserCredential(ConfigurationManager.AppSettings["csp:admin"], ConfigurationManager.AppSettings["csp:admin-password"]);
+            AuthenticationContext authContext = new AuthenticationContext(addAuthority.Uri.AbsoluteUri);
+            return authContext.AcquireToken(ConfigurationManager.AppSettings["partnercenter-endpoint"], ConfigurationManager.AppSettings["aad:client-id"], userCredentials);
+        }
+
+        public static IAggregatePartner GetPartnerCenterTokenWithUserCredentials()
+        {
+            // Get a user Azure AD Token.
+            var aadAuthResult = LoginToAad();
+            PartnerService.Instance.ApiRootUrl = ConfigurationManager.AppSettings["partnercenter-endpoint"];
+            var partnerCredentials =
+                PartnerCredentials.Instance.GenerateByUserCredentials(getUserLoginInformation().ClientId,
+                    new AuthenticationToken(aadAuthResult.AccessToken, aadAuthResult.ExpiresOn), async delegate
+                    {
+                // Token Refresh callback.
+                aadAuthResult = LoginToAad();
+                        return await Task.FromResult<AuthenticationToken>(new AuthenticationToken(aadAuthResult.AccessToken, aadAuthResult.ExpiresOn));
+                    });
+
+            // Get operations instance with partnerCredentials.
+            return PartnerService.Instance.CreatePartnerOperations(partnerCredentials);
+        }
+
+
+
+
+        private static UserLoginInformation getUserLoginInformation()
+        {
 
             var uli = new UserLoginInformation();
-            uli.ClientId = ConfigurationManager.AppSettings["aad:client-id"] ;
+            uli.ClientId = ConfigurationManager.AppSettings["aad:client-id"];
             uli.UserName = ConfigurationManager.AppSettings["csp:admin"];
             uli.Password = ConfigurationManager.AppSettings["csp:admin-password"];
 
             return uli;
         }
+
     }
 }
