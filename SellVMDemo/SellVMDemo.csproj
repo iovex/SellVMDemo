@@ -387,6 +387,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\demo.css" />
     <Content Include="Scripts\vmoptions.js" />
     <Content Include="Views\Vmoptions\Index.cshtml" />
     <Content Include="Web.config">
