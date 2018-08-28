@@ -148,17 +148,11 @@ namespace SellVMDemo.Controllers
             var azureRateCardMeters = partner.RateCards.Azure.Get().Meters.ToList();
         
             var vmSizeParams = vmParams.vmSzie.ToLower().Split('_');
-            
-            var vmType = vmSizeParams[1];
-            vmType = vmType.Replace("s", "");
-            if (vmType.Split('_').Length==2) {
-                vmType = vmType.Split('_')[0];
-            }
 
-            if (vmType.Split('-').Length == 2)
-            {
-                vmType = vmType.Split('-')[0];
-            }
+            var vmSize = vmSizeParams[1].Split('-')[0];
+
+            if (vmSizeParams.Length > 2)
+                vmSize += (" " + vmSizeParams[2].Split('-')[0]);
 
             var regionMap = "[{\"Value\":\"AU East\",\"Key\":\"australiaeast\"},\r\n{\"Value\":\"AU Southeast\",\"Key\":\"australiasoutheast\"},\r\n{\"Value\":\"AP Southeast\",\"Key\":\"southeastasia\"},\r\n{\"Value\":\"AP East\",\"Key\":\"eastasia\"},\r\n{\"Value\":\"EU North\",\"Key\":\"northeurope\"},\r\n{\"Value\":\"EU West\",\"Key\":\"westeurope\"},\r\n{\"Value\":\"BR South\",\"Key\":\"brazilsouth\"},\r\n{\"Value\":\"US West Central\",\"Key\":\"westcentralus\"},\r\n{\"Value\":\"US South Central\",\"Key\":\"southcentralus\"},\r\n{\"Value\":\"US North Central\",\"Key\":\"northcentralus\"},\r\n{\"Value\":\"US East\",\"Key\":\"eastus\"},\r\n{\"Value\":\"US East 2\",\"Key\":\"eastus2\"},\r\n{\"Value\":\"US West\",\"Key\":\"westus\"},\r\n{\"Value\":\"US West 2\",\"Key\":\"westus2\"},\r\n{\"Value\":\"US Central\",\"Key\":\"centralus\"},\r\n{\"Value\":\"JA West\",\"Key\":\"japanwest\"},\r\n{\"Value\":\"JA East\",\"Key\":\"japaneast\"},\r\n{\"Value\":\"CA East\",\"Key\":\"canadaeast\"},\r\n{\"Value\":\"CA Central\",\"Key\":\"canadacentral\"},\r\n{\"Value\":\"KR Central\",\"Key\":\"koreacentral\"},\r\n{\"Value\":\"KR South\",\"Key\":\"koreasouth\"},\r\n{\"Value\":\"UK West\",\"Key\":\"ukwest\"},\r\n{\"Value\":\"UK South\",\"Key\":\"uksouth\"},\r\n{\"Value\":\"IN Central\",\"Key\":\"centralindia\"},\r\n{\"Value\":\"IN West\",\"Key\":\"westindia\"},\r\n{\"Value\":\"IN South\",\"Key\":\"southindia\"}]";
 
@@ -172,8 +166,7 @@ namespace SellVMDemo.Controllers
             var vmlist = new List<AzureMeter>();
             foreach (var meter in azureRateCardMeters) {
                 if (meter.Category == "Virtual Machines" && 
-                    meter.Subcategory.ToLower().IndexOf(vmSizeParams[0]) >=0 &&
-                    meter.Subcategory.ToLower().IndexOf(vmType)  > 0  && 
+                    meter.Name.ToLower().IndexOf(vmSize) >=0 &&
                     meter.Subcategory.ToLower().IndexOf("low priority") <0 &&
                     meter.Region == region ) { vmlist.Add(meter); }
             }

@@ -143,8 +143,8 @@ function CheckAndPurchase(obj){
 	
 	if(getParams()){
 
-		obj.innerHTML="request sent , it will take about 15 mins , pls wait  "
-		obj.disabled="disabled";
+		obj.innerHTML="creating,pls wait"
+        obj.disabled = "disabled";
 		
 		$.ajax({
 			type:"post",
