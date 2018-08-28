@@ -7,3 +7,6 @@
 /.vs/SellVMDemo/v15
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
+/.vs/SellVMDemo/DesignTimeBuild
+/.vs
+/SellVMDemo/obj/Debug
