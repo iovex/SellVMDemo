@@ -143,7 +143,7 @@ function CheckAndPurchase(obj){
 	
 	if(getParams()){
 
-		obj.innerHTML="creating,pls wait"
+		obj.innerHTML="creating,about 15 mins"
         obj.disabled = "disabled";
 		
 		$.ajax({
@@ -229,7 +229,7 @@ function getPricing(){
 				for(var index in vmParams.dataDisksDetails)
 					totalDiskSize += parseInt(vmParams.dataDisksDetails[index].size); 
 				
-				var pricing = time*(vmp.rates*30*24 + vmp.diskRating * totalDiskSize);　
+				var pricing = time*(vmp.rates*30*24 + vmp.diskRating * (totalDiskSize + 120));　
 				if($("#modeSelector").val() ==2 )pricing = pricing *12;
 				
 				
